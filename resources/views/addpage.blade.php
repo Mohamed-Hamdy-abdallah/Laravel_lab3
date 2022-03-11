@@ -29,8 +29,16 @@
             @if ($errors->has('user_id'))
                 <div class="text-danger">{{ $errors->first('user_id') }}</div>
             @endif
+
+            <div class="mb-3">
+     
+                <input name="numberOfPosts" type="text" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" value="{{$user->numberOfPosts}} " readonly/>
+              </div>
+            @if ($errors->has('numberOfPosts'))
+                <div class="text-danger">{{ $errors->first('numberOfPosts') }}</div>
+            @endif
             <button type="submit" class="btn btn-success">Submit</button>
+        </form>
     </div>
-    </form>
-    </div>
+    
 @endsection

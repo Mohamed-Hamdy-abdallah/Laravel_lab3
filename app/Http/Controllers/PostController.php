@@ -9,6 +9,8 @@ use App\Http\Requests\UpdatePostRequest;
 use Illuminate\Support\Facades\Auth;
 use \Cviebrock\EloquentSluggable\Services\SlugService;
 use App\Jobs\PruneOldPostsJob;
+use NumberFormatter;
+
 class PostController extends Controller
 {
     public function index()
@@ -25,7 +27,12 @@ class PostController extends Controller
     }
     public function store(StorePostRequest $request)
     {
-        $request->validate([]);
+
+       $requested= $request->validated();
+        $user = User::findOrFail($request->user_id);
+        $numberOfPosts = $user->numberOfPosts + 1;
+        $user->numberOfPosts = $numberOfPosts;
+        $user->save () ; 
         $post = new Post();
         $post->title = $request->title;
         $slug = SlugService::createSlug(Post::class, 'slug', $request->title);
@@ -46,8 +53,8 @@ class PostController extends Controller
     public function edit(Post $post)
     {
         // $post=Post::findOrFail($post);
-        if($post->user_id!=Auth::user()->id)
-            abort(401);
+        // if($post->user_id!=Auth::user()->id)
+        //     abort(401);
         $users = User::all();
         if ($post) {
             return view("updatepage", ["post" => $post, "users" => $users]);
@@ -55,6 +62,7 @@ class PostController extends Controller
     }
     public function update(UpdatePostRequest $request, Post $post)
     {
+        $this->authorize("Belongs",$post);
         $request->validate([]);
         // $updatedpost = Post::find($post);
         $post->title = $request->title;
@@ -67,9 +75,13 @@ class PostController extends Controller
     }
     public function destroy(Post $post)
     {
+        $user = User::findOrFail($post->user_id);
+        $user->numberOfPosts= $user->numberOfPosts-1 ; 
+        $user->save () ; 
         // dd($post);
-        if($post->user_id!=Auth::user()->id)
-            abort(401);
+        $this->authorize("Belongs",$post);
+        // if($post->user_id!=Auth::user()->id)
+        //     abort(401);
         $post->delete();
         return to_route("posts.index");
     }
