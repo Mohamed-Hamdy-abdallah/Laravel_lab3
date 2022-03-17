@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Auth\LoginController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\PostController ;
 use App\Http\Controllers\UserController ;
@@ -31,6 +32,7 @@ Route::resource("posts",PostController::class)->middleware("auth");
 Route::get('/',[PostController::class,"index"])->middleware("auth");
 Route::get("/user/posts/view/{user}", [UserController::class,"userPosts"])->name("user.posts");
 Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
-
+Route::get('auth/google', [LoginController::class, 'redirectToGoogle']);
+Route::get('auth/google/callback', [LoginController::class, 'handleGoogleCallback']);
 
 
